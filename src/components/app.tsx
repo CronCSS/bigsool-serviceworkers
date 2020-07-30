@@ -8,13 +8,12 @@ import { useDispatch } from 'react-redux'
 import { addNotification, queueNotification } from '../redux/notifications/actions';
 import { NotificationTypes } from '../redux/notifications/types';
 
-
 export const AppContext = React.createContext<AppContextType | undefined>(undefined);
 
-const makeCancelable = function(promise):CancelablePromise {
+const makeCancelable = function(promise:Promise<any>):CancelablePromise {
   let hasCanceled_:boolean = false;
 
-  const wrappedPromise:Promise<boolean> = new Promise((resolve, reject) => {
+  const wrappedPromise:Promise<any> = new Promise((resolve, reject) => {
     promise.then((val) =>
       hasCanceled_ ? reject({isCanceled: true}) : resolve(val)
     );
@@ -30,31 +29,36 @@ const makeCancelable = function(promise):CancelablePromise {
   };
 };
 
-const staticRessources:Array<RessourceType> = [
-    { local: true, url: 'bundle.js' },
-    { local: true, url: '' },
-    { local: false, url: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap' },
-    { local: false, url: 'https://fonts.googleapis.com/icon?family=Material+Icons' },
-    { local: false, url :'https://unpkg.com/react@16.13.1/umd/react.development.js' },
-    { local: false, url :'https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js' }
-];
+enum CacheStateEnum {
+    none,
+    started,
+    progress,
+    cached,
+    finished,
+    error
+}
 
 const App = ({ children }: Props) => {
     const [ offline, setOffline ] = useState<boolean>( !navigator.onLine );
     const [ photos, setPhotos ] = useState<Array<PhotoType>>([]);
-    const [ cacheState, dispatch ] = useReducer(reducer, { offline: false, busy: false });
+    const [ cacheState, dispatch ] = useReducer(reducer, { busy: false, state: CacheStateEnum.none } );
 
     let cancelablePromises = useRef<Array<CancelablePromise>>([]);
     let reduxDispatch = useDispatch();
 
     // hook called on initial mount - get pictures!
     React.useEffect(() => {
-        window.addEventListener('offline', (event) => { setOffline(true); });
-        window.addEventListener('online', (event) => { setOffline(false); });
+        window.addEventListener('offline', () => { setOffline(true); });
+        window.addEventListener('online', () => { setOffline(false); });
 
-        fetch('https://api.flickr.com/services/rest?api_key=f78662aec2a67e97cce984b14d2a58e6&method=flickr.photos.getPopular&user_id=113291043@N05&format=json&nojsoncallback=1&extras=owner_name,description', { method: 'GET' } ).then(
+        fetch('https://api.flickr.com/services/rest?api_key=f78662aec2a67e97cce984b14d2a58e6&method=flickr.photos.getPopular&user_id=113291043@N05&format=json&nojsoncallback=1&extras=owner_name,description', { method: 'GET', cache: "no-store" } ).then(
             response => {
-                if( response.ok ) return response.json()
+                if( response.ok ) {
+                    caches.open('app-cache').then(function(cache) {
+                        cache.add( 'https://api.flickr.com/services/rest?api_key=f78662aec2a67e97cce984b14d2a58e6&method=flickr.photos.getPopular&user_id=113291043@N05&format=json&nojsoncallback=1&extras=owner_name,description');
+                    });
+                    return response.json();
+                }
                 else {
                     switch( response.status ){
                         case 401:
@@ -64,41 +68,37 @@ const App = ({ children }: Props) => {
                 }
             }
         ).then((response) =>{
-            setPhotos( response.photos.photo.slice(0, 10).map((e,k) => {
+            setPhotos( response.photos.photo.slice(0, 16).map((e,k) => {
                 return { url: `https://farm${e.farm}.staticflickr.com/${e.server}/${e.id}_${e.secret}_z.jpg`, name: e.title, ownerName: e.ownername, description: e.description._content };
             }));
-        });
+        }).catch( () => { });
 
         return () => { /* handle dismount */ }
     }, []);
 
+    React.useEffect(()=>{
+        if( offline ){
+            queueNotification( reduxDispatch, 'Your browser is offline.', NotificationTypes.temporary );
+        }
+        else {
+            queueNotification( reduxDispatch, 'Your browser is online.', NotificationTypes.temporary );
+        }
+    },[offline]);
+
     function reducer(state: CacheStateType, action: CacheAction): CacheStateType {
         switch (action.type) {
             case 'start':
-                let promises:Array<Promise<void>> = [];
-
-                caches.open('flickr-cache').then(function(cache) {
-                    photos.forEach( (e:any,k:number) => {
-                        let cp = makeCancelable( cache.add( e.url ) );
-                        cp.promise.then( () => { dispatch( { type: 'progress' } ); }, () => { /* handle error/cancel */ } )
-                        cancelablePromises.current.push( cp );
-                    } );
-
-                    staticRessources.forEach( (e:any,k:number) => {
-                        let cp = makeCancelable( cache.add( e.url ) );
-                        cp.promise.then( () => { dispatch( { type: 'progress' } ); }, () => { /* handle error/cancel */ } )
-                        cancelablePromises.current.push( cp );
-                    } );
-                    Promise.all( cancelablePromises.current.map( ( p:CancelablePromise ) => { return p.promise } ) ).then( () => { dispatch( { type: 'finished' } ); }, () => { /* handle error/cancel */ } );
-                } );
-                return { offline: false, busy: true, progress: { cached: 0, total: photos.length + staticRessources.length } };
+                return { busy: true, state: CacheStateEnum.none, progress: { cached: 0, total: photos.length } };
             case 'progress':
-                return { offline: false, busy: true, progress: { cached: state.progress?++state.progress.cached:0, total: state.progress?state.progress.total:0 } };
+                return { busy: true, state: CacheStateEnum.progress, progress: { cached: state.progress?++state.progress.cached:0, total: state.progress?state.progress.total:0 } };
+            case 'cached':
+                return { busy: true, state: CacheStateEnum.cached, progress: state.progress };
             case 'finished':
-                return { offline: true, busy: false, progress: state.progress };
-            case 'online':
+                return { busy: false, state: CacheStateEnum.finished, progress: state.progress };
+            case 'error':
+                return { busy: true, state: CacheStateEnum.error, progress: state.progress };
             case 'canceled':
-                return { offline: false, busy: false, progress: state.progress  };
+                return { busy: false, state: CacheStateEnum.none, progress: state.progress  };
         }
     }
 
@@ -106,21 +106,34 @@ const App = ({ children }: Props) => {
         return caches.delete('flickr-cache');
     }
 
-    function handleClick( event:MouseEvent ):void {
-        if( !cacheState.offline ) dispatch( { type: 'start' } );
-        else dispatch( { type: 'online' } );
+    function handleClick():void {
+        cancelablePromises.current = [];
+        caches.open('flickr-cache').then(function(cache) {
+            photos.forEach( (e:any) => {
+                let cp = makeCancelable( cache.add( e.url ) );
+                cp.promise.then( () => { dispatch( { type: 'progress' } ); } );
+                // cp.promise.catch( (error:TypeError) => { console.log( error )} );
+                cancelablePromises.current.push( cp );
+            } );
+
+            Promise.all( cancelablePromises.current.map( ( p:CancelablePromise ) => { return p.promise } ) )
+            .then( () => { dispatch( { type: 'cached' } ); } )
+            .catch( () => { dispatch( { type: 'error' } ); } );
+        } );
+        dispatch( { type: 'start' } );
     }
 
     function handleCancelClick( event:MouseEvent ):void {
         cancelablePromises.current.forEach( ( p:CancelablePromise, k:number ) => { p.cancel(); } );
-        //
-        // wipeCache().then( ()=>{
-        //     dispatch( { type: 'canceled' } );
-        // } );
+        dispatch( { type: 'canceled' } );
+    }
+
+    function handleCloseClick(){
+        dispatch( { type: 'finished' } );
     }
 
     function handleWipeClick( event:MouseEvent ):void {
-        queueNotification( reduxDispatch, 'Clearing cache...', NotificationTypes.temporary );
+        // queueNotification( reduxDispatch, 'Clearing cache...', NotificationTypes.temporary );
 
         caches.has('flickr-cache').then( function( hasCache:boolean ) {
             if( hasCache ) {
@@ -141,11 +154,42 @@ const App = ({ children }: Props) => {
             <>
             <div className="ModalBackground"></div>
             <div className="Modal">
-                <div className="Content">
-                    <ProgressBar progress={ cacheState.progress?((cacheState.progress.cached/cacheState.progress.total)*100):undefined } />
-                    Caching data, please wait... ( { cacheState.progress!.cached } / { cacheState.progress!.total } )
-                </div>
-                <div className="Actions" onClick={ handleCancelClick }><button type="button">Cancel</button></div>
+                { (cacheState.state === CacheStateEnum.cached ) &&
+                    <>
+                    <div className="Content">
+                    <ProgressBar progress={ 100 } />
+                        Caching complete!<br/>Application will now work offline.
+                        </div>
+                    <div className="Actions" onClick={ handleCloseClick }><button type="button">Close</button></div>
+                    </>
+                }
+                { (cacheState.state === CacheStateEnum.error ) &&
+                    <>
+                    <div className="Content">
+                    <ProgressBar progress={ 0 } />
+                        An error happened during cache!<br/>Please check your internet connectivity.
+                        </div>
+                    <div className="Actions" onClick={ handleCloseClick }><button type="button">Close</button></div>
+                    </>
+                }
+                { ( ( cacheState.state === CacheStateEnum.none ) || ( cacheState.state === CacheStateEnum.started ) ) &&
+                    <>
+                    <div className="Content">
+                        <ProgressBar progress={ 0 } />
+                        Caching data, please wait...
+                    </div>
+                    <div className="Actions" onClick={ handleCloseClick }><button type="button">Close</button></div>
+                    </>
+                }
+                { (cacheState.state === CacheStateEnum.progress ) &&
+                    <>
+                    <div className="Content">
+                        <ProgressBar progress={ cacheState.progress?((cacheState.progress.cached/cacheState.progress.total)*100):undefined } />
+                        Caching data, please wait... ( { cacheState.progress!.cached } / { cacheState.progress!.total } )
+                    </div>
+                    <div className="Actions" onClick={ handleCancelClick }><button type="button">Cancel</button></div>
+                    </>
+                }
             </div>
             </>
         }
@@ -154,14 +198,14 @@ const App = ({ children }: Props) => {
                 <div className="Title">Application</div>
                 <div className="State">
                     <div className="Icon">
-                        { !offline && <>cloud_queue</> }
-                        { offline && <>cloud_off</> }
+                        { !offline && <>wifi</> }
+                        { offline && <>wifi_off</> }
                     </div>
                 </div>
             </div>
 
             <div className="BottomNav">
-                <button type="button" className="Floating" onClick={ handleClick }>{ cacheState.offline && <><div className="Icon">wifi</div><span>Switch to Online Mode</span></> }{ !cacheState.offline && <><div className="Icon">wifi_off</div><span>Switch to Offline Mode</span></> }</button>
+                <button type="button" className="Floating" onClick={ handleClick }><div className="Icon">cached</div><span>Cache data</span></button>
                 <button type="button" className="Floating NoText" onClick={ handleWipeClick }><div className="Icon">delete_forever</div></button>
             </div>
             <Notifications />
@@ -169,11 +213,13 @@ const App = ({ children }: Props) => {
                 <div className="Photos">
                 { photos.map( (e:any,k:number) =>
                     <div className="Photo" key={ k }>
-                        <div className="Inner" style={{backgroundImage: `url(${e.url})`}}></div>
-                        <div className="Text">
-                            <div className="Title">{ e.name }</div>
-                            <div className="Owner">by { e.ownerName }</div>
-                            <div className="Description">{ e.description }</div>
+                        <div className="Card">
+                            <div className="Inner" style={{backgroundImage: `url(${e.url})`}}></div>
+                            <div className="Text">
+                                <div className="Title">{ e.name }</div>
+                                <div className="Owner">by { e.ownerName }</div>
+                                <div className="Description">{ e.description }</div>
+                            </div>
                         </div>
                     </div>
                 )}

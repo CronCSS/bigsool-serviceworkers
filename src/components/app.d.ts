@@ -1,7 +1,3 @@
-interface RessourceType {
-    url: string
-    local: boolean
-}
 
 interface CancelablePromise {
     promise: Promise<unknown>
@@ -14,8 +10,8 @@ interface CacheStateProgressType {
 }
 
 interface CacheStateType {
-    offline: boolean
     busy: boolean
+    state: CacheStateEnum,
     progress?: CacheStateProgressType
 }
 
@@ -31,7 +27,7 @@ interface PhotoType {
     description: string
 }
 
-type CacheAction = | { type: 'start' } | { type: 'progress' } | { type: 'finished' } | { type: 'canceled' } | { type: 'online' };
+type CacheAction = | { type: 'start' } | { type: 'progress' } | { type: 'finished' } | { type: 'canceled' } | { type: 'cached' } | { type: 'error' };
 
 interface Props {
   children?: React.ReactNode

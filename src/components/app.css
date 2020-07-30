@@ -99,7 +99,7 @@ button.Floating .Icon {
     top:50%;
     left:50%;
     width:400px;
-    max-width: 100%;
+    max-width: 80%;
     transform: translate(-50%, -50%);
     background: #FFF;
     border-radius: 3px;
@@ -124,46 +124,32 @@ button.Floating .Icon {
 
 @media screen and (min-width: 640px) {
     .App {
-        width:700px;
-        margin: 0 auto;
+
     }
 
     .Photos {
         display: flex;
         flex-wrap: wrap;
         margin: 0 0 0 -10px;
-        /* width: 100%; */
+        width: auto !important;
         overflow: hidden;
+        max-width:1024px;
+        width:100%;
+        margin: 0 auto;
     }
 
     .Photos .Photo {
-        flex:0 0 auto;
-        /* padding:0 10px 0 0; */
+        flex:0 0 50%;
+        padding:0 0 0 10px;
         width:50%;
-        padding:0 0 10px 10px;
     }
 
-    .Photos .Photo .Inner {
-        width: 100%;
-        padding-bottom: 70%;
-        position: relative;
-        overflow: hidden;
-        background-position: 50% 50%;
+    .Photos .Photo .Card {
+        height: 100%;
     }
 
-    .Photos .Photo .Inner .Title {
-        position: absolute;
-        width:100%;
-        background: rgba(255,255,255,0.6);
-        padding:10px;
-        text-align: center;
-        transform: translateY(100%);
-        transition: ease 200ms transform;
-        bottom: 0;
-    }
-
-    .Photos .Photo .Inner:hover .Title {
-        transform: translateY(0);
+    .Photos .Photo:nth-last-child(-n+2) {
+        margin-bottom: 0;
     }
 }
 
@@ -214,9 +200,13 @@ button.Floating .Icon {
 .Photos .Photo {
     width: 100%;
     margin-bottom: 10px;
+}
+
+.Photos .Photo .Card {
     border-radius: 4px;
-    overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    overflow: hidden;
+    background: #FFF;
 }
 
 .Photos .Photo:last-child {
@@ -229,6 +219,8 @@ button.Floating .Icon {
     position: relative;
     overflow: hidden;
     background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .Photos .Photo .Text {

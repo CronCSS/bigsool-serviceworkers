@@ -4,9 +4,10 @@
   "description": "Bigsool - Test technique",
   "main": "index.ts",
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack -w",
-    "start": "webpack-dev-server -d --config webpack.config.js --watch"
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js -w",
+    "start": "webpack-dev-server -d --config webpack.config.dev.js --watch",
+    "prod": "http-server public"
   },
   "keywords": [],
   "author": "Lionel Souyris",
@@ -14,6 +15,7 @@
   "devDependencies": {
     "@types/react": "^16.9.43",
     "@types/react-dom": "^16.9.8",
+    "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^4.0.0",
     "source-map-loader": "^1.0.1",
     "style-loader": "^1.2.1",
