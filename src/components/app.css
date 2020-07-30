@@ -1,0 +1,251 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  font-size:14px;
+  font-weight: 200;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+button:focus {outline:0;}
+
+button[type="button"] {
+    background:rgba(0,0,0,0);
+    transition: ease 200ms background;
+    text-transform: uppercase;
+    border: 0;
+    font-weight: bold;
+    padding:5px;
+    margin:0 0 0 10px;
+    color: #454545;
+    font-family: 'Open Sans', sans-serif;
+    font-size:14px;
+    border-radius: 3px;
+}
+
+button[type="button"]:active {
+    background:rgba(0,0,0,0.2);
+}
+
+button.Floating {
+    color: #FF4B3E;
+    border-radius: 30px;
+    background: #FFF;
+    padding:10px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    display: flex;
+    align-items: center;
+    font-size: .8rem;
+    text-transform: none;
+}
+
+button.Floating.NoText {
+    padding:10px;
+}
+
+button.Floating.NoText .Icon {
+    margin-right:0;
+}
+
+button.Floating:active {
+    background: #F0F0F0;
+}
+
+button.Floating .Icon {
+    font-size: 30px;
+    height: 30px;
+    line-height:30px;
+    width: 30px;
+    margin-right: 15px;
+}
+
+.Icon {
+    box-sizing:border-box;
+    direction:ltr;
+    display:inline-block;
+    font-family:"Material Icons";
+    font-feature-settings:"liga";
+    font-size:48px;
+    font-style:normal;
+    font-weight:400;
+    height:48px;
+    letter-spacing:normal;
+    line-height:48px;
+    overflow-wrap:normal;
+    overflow-x:hidden;
+    overflow-y:hidden;
+    text-align:center;
+    text-transform:none;
+    user-select:none;
+    white-space:nowrap;
+    width:48px;
+}
+
+.ModalBackground {
+    background: rgba(0,0,0,0.5);
+    position: fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    z-index: 2000;
+}
+
+.Modal {
+    position: fixed;
+    top:50%;
+    left:50%;
+    width:400px;
+    max-width: 100%;
+    transform: translate(-50%, -50%);
+    background: #FFF;
+    border-radius: 3px;
+    z-index: 2010;
+    padding:40px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.Modal .Content {
+    padding:40px 0;
+}
+
+.Modal .Actions {
+    margin:0 0 -40px 0;
+    padding:0 0 20px 0;
+    text-align: right;
+}
+
+@media screen and (min-width: 640px) {
+    .App {
+        width:700px;
+        margin: 0 auto;
+    }
+
+    .Photos {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 0 0 -10px;
+        /* width: 100%; */
+        overflow: hidden;
+    }
+
+    .Photos .Photo {
+        flex:0 0 auto;
+        /* padding:0 10px 0 0; */
+        width:50%;
+        padding:0 0 10px 10px;
+    }
+
+    .Photos .Photo .Inner {
+        width: 100%;
+        padding-bottom: 70%;
+        position: relative;
+        overflow: hidden;
+        background-position: 50% 50%;
+    }
+
+    .Photos .Photo .Inner .Title {
+        position: absolute;
+        width:100%;
+        background: rgba(255,255,255,0.6);
+        padding:10px;
+        text-align: center;
+        transform: translateY(100%);
+        transition: ease 200ms transform;
+        bottom: 0;
+    }
+
+    .Photos .Photo .Inner:hover .Title {
+        transform: translateY(0);
+    }
+}
+
+.Header {
+    height: 60px;
+    padding: 10px 20px;
+    background: #FFF;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Header .Title {
+    font-weight: 900;
+    /* text-transform: uppercase; */
+    font-style: italic;
+    display: flex;
+    align-items: center;
+}
+
+.Header .State .Icon {
+    font-size: 24px;
+    height: 24px;
+    line-height:24px;
+    width: 24px;
+    display: block;
+}
+
+.BottomNav {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+    padding:20px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.Photos {
+    width:100%;
+    padding:10px;
+}
+
+.Photos .Photo {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.Photos .Photo:last-child {
+    margin-bottom: 0;
+}
+
+.Photos .Photo .Inner {
+    width: 100%;
+    padding-bottom: 70%;
+    position: relative;
+    overflow: hidden;
+    background-position: 50% 50%;
+}
+
+.Photos .Photo .Text {
+    padding:20px;
+    font-weight: 200;
+}
+
+.Photos .Photo .Text .Title {
+    font-weight: 800;
+}
+
+.Photos .Photo .Text .Description {
+    font-size: .7rem;
+    margin-top:10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
