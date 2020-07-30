@@ -6,14 +6,14 @@ export interface Photo {
 }
 
 export interface PhotoState {
-    photos: Photo[]
+    photos: Array<Photo>
 }
 
 export const UPDATE_PHOTOS = 'UPDATE_PHOTOS'
 
 interface UpdatePhotosAction {
     type: typeof UPDATE_PHOTOS
-    photos: Array<PhotoState>
+    photos: Array<Photo>
 }
 
-export type NotificationActionTypes = UpdatePhotosAction
+export type PhotoActionTypes = UpdatePhotosAction
