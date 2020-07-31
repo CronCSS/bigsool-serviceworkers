@@ -43,4 +43,4 @@ Un système de notifications affiche également des informations relative a la c
 
 Pour tester le comportement des images de remplacements / *fallback* on peut simplement re-visiter le site en mode hors ligne sans avoir mis en cache les images.
 
-L'interface est optimsiée *mobile-first* mais s'adapte aux plus grandes résolutions. ( mediaqueries très basiques )
+L'interface est optimisée *mobile-first* mais s'adapte aux plus grandes résolutions. ( mediaqueries très basiques )
