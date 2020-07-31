@@ -10,25 +10,6 @@ import { NotificationTypes } from '../redux/notifications/types';
 
 export const AppContext = React.createContext<AppContextType | undefined>(undefined);
 
-const makeCancelable = function(promise:Promise<any>):CancelablePromise {
-  let hasCanceled_:boolean = false;
-
-  const wrappedPromise:Promise<any> = new Promise((resolve, reject) => {
-    promise.then((val) =>
-      hasCanceled_ ? reject({isCanceled: true}) : resolve(val)
-    );
-    promise.catch((error) =>
-      hasCanceled_ ? reject({isCanceled: true}) : reject(error)
-    );
-  });
-  return {
-    promise: wrappedPromise,
-    cancel() {
-      hasCanceled_ = true;
-    },
-  };
-};
-
 enum CacheStateEnum {
     none,
     started,
@@ -37,6 +18,25 @@ enum CacheStateEnum {
     finished,
     error
 }
+
+const makeCancelable = function(promise:Promise<any>):CancelablePromise {
+    let hasCanceled_:boolean = false;
+
+    const wrappedPromise:Promise<any> = new Promise( (resolve, reject) => {
+        promise.then((val) =>
+            hasCanceled_ ? reject({isCanceled: true}) : resolve(val)
+        );
+        promise.catch((error) =>
+            hasCanceled_ ? reject({isCanceled: true}) : reject(error)
+        );
+    });
+    return {
+        promise: wrappedPromise,
+        cancel() {
+            hasCanceled_ = true;
+        },
+    };
+};
 
 const App = ({ children }: Props) => {
     const [ offline, setOffline ] = useState<boolean>( !navigator.onLine );
@@ -73,7 +73,7 @@ const App = ({ children }: Props) => {
             }));
         }).catch( () => { });
 
-        return () => { /* handle dismount */ }
+        return () => { /* TODO - handle dismount */ }
     }, []);
 
     React.useEffect(()=>{
@@ -118,7 +118,11 @@ const App = ({ children }: Props) => {
 
             Promise.all( cancelablePromises.current.map( ( p:CancelablePromise ) => { return p.promise } ) )
             .then( () => { dispatch( { type: 'cached' } ); } )
-            .catch( () => { dispatch( { type: 'error' } ); } );
+            .catch( ( e ) => {
+                if( e.isCanceled ) dispatch( { type: 'canceled' }  );
+                else dispatch( { type: 'error' }  );
+                return;
+            } );
         } );
         dispatch( { type: 'start' } );
     }
