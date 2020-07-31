@@ -2,7 +2,7 @@
   "name": "bigsool-react",
   "version": "1.0.0",
   "description": "Bigsool - Test technique",
-  "main": "index.ts",
+  "main": "index.tsx",
   "scripts": {
     "build": "webpack --config webpack.config.prod.js",
     "start": "webpack-dev-server -d --config webpack.config.dev.js --watch"
