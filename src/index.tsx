@@ -4,6 +4,7 @@ import App from './components/app';
 import { Provider, shallowEqual, useSelector, useDispatch } from 'react-redux'
 import { createStore } from 'redux'
 import { notificationReducer } from './redux/notifications/reducer'
+import './fonts.css'
 
 const store = createStore( notificationReducer );
 

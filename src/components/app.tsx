@@ -42,6 +42,7 @@ const App = ({ children }: Props) => {
     const [ offline, setOffline ] = useState<boolean>( !navigator.onLine );
     const [ photos, setPhotos ] = useState<Array<PhotoType>>([]);
     const [ cacheState, dispatch ] = useReducer(reducer, { busy: false, state: CacheStateEnum.none } );
+    const [ timestamp, setTimestamp ] = useState<number>( new Date().getTime() );
 
     let cancelablePromises = useRef<Array<CancelablePromise>>([]);
     let reduxDispatch = useDispatch();
@@ -68,7 +69,7 @@ const App = ({ children }: Props) => {
                 }
             }
         ).then((response) =>{
-            setPhotos( response.photos.photo.slice(0, 16).map((e,k) => {
+            setPhotos( response.photos.photo.slice(0, 16).map((e:any,k) => {
                 return { url: `https://farm${e.farm}.staticflickr.com/${e.server}/${e.id}_${e.secret}_z.jpg`, name: e.title, ownerName: e.ownername, description: e.description._content };
             }));
         }).catch( () => { });
@@ -213,7 +214,7 @@ const App = ({ children }: Props) => {
                 { photos.map( (e:any,k:number) =>
                     <div className="Photo" key={ k }>
                         <div className="Card">
-                            <div className="Inner" style={{backgroundImage: `url(${e.url})`}}></div>
+                            <div className="Inner" style={{backgroundImage: `url(${ e.url }?cache-deny=${ timestamp })`}}></div>
                             <div className="Text">
                                 <div className="Title">{ e.name }</div>
                                 <div className="Owner">by { e.ownerName }</div>

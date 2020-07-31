@@ -58,7 +58,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: 'assets', to: 'assets' },
-                { from: 'src/manifest.json', to: 'public/manifest.json' }
+                { from: 'src/manifest.json', to: 'manifest.json' }
             ]
         }),
         new webpack.HotModuleReplacementPlugin(),
