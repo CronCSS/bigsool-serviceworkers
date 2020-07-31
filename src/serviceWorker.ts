@@ -36,8 +36,11 @@ self.addEventListener('install', (event:any) => {
     );
 });
 
-self.addEventListener('activate', () => {
-	return self.clients.claim();
+self.addEventListener('activate', (event) => {
+	self.clients.claim();
+
+    // On supprime le cache d'image après une mise à jour du service worker
+    event.waitUntil( caches.delete('flickr-cache') );
 });
 
 self.addEventListener('fetch', (event:any) => {

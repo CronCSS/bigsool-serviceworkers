@@ -135,7 +135,7 @@ const App = ({ children }: Props) => {
     function handleWipeClick( event:MouseEvent ):void {
         // queueNotification( reduxDispatch, 'Clearing cache...', NotificationTypes.temporary );
 
-        caches.has('flickr-cache').then( function( hasCache:boolean ) {
+        caches.has('flickr-cache').then( ( hasCache:boolean ) => {
             if( hasCache ) {
                 wipeCache().then( () => {
                     queueNotification( reduxDispatch, 'Cache cleared!', NotificationTypes.temporary );
