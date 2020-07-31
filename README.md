@@ -14,6 +14,11 @@ npm run start # démarre le serveur de développement sur http://localhost:8087/
 npm run build # génère un bundle de production dans /public
 ```
 
+## Préambule
+
+L'application doit être mise en ligne sur un serveur sécurisé (HTTPS) ou depuis l'URL par défaut ( localhost )
+L'interface est optimsiée *mobile-first* mais s'adapte aux plus grandes résolutions. ( mediaqueries très basiques )
+
 ## Fonctionnement du service worker
 
 Lors de l'enregistrement du service worker, le **shell** de l'application et ses dépendances sont mises en cache. ( React/ReactDOM, police icone, image *fallback*, index.html )
@@ -28,7 +33,7 @@ Si le service worker ne parvient pas a télécharger une image ( navigateur hors
 
 Si l'image demandée n'est pas en cache, l'image *fallback* est renvoyée au navigateur.
 
-## Fonctionnement de l'Application
+## Fonctionnement de l'application
 
 L'application télécharge une liste de 16 images depuis l'API Flickr et stocke immédiatement ces informations en cache pour que le service worker puisse les *servir* en mode hors ligne.
 Ces images sont ensuite téléchargées par l'application.

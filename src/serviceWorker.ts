@@ -3,7 +3,8 @@
 /// <reference lib="webworker" />
 /// <reference path="serviceworker.d.ts" />
 
-// interface Window extends ServiceWorkerGlobalScope {}
+declare var self: ServiceWorkerGlobalScope;
+export {};
 
 interface RessourceType {
     url: string
@@ -27,15 +28,15 @@ else {
 }
 self.addEventListener('install', (event:any) => {
     event.waitUntil(
-        caches.open( 'app-cache').then(function(cache:Cache) {
+        caches.open( 'app-cache').then( (cache:Cache) => {
             return cache.addAll( staticRessources.map( (e:RessourceType) => { return e.url } ) )
-        }).then(function() {
+        }).then( () => {
             return self.skipWaiting();
         })
     );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', () => {
 	return self.clients.claim();
 });
 
@@ -72,5 +73,3 @@ self.addEventListener('fetch', (event:any) => {
         });
     }));
 });
-
-export {}
