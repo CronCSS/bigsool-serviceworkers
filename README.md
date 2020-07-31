@@ -35,7 +35,7 @@ Si l'image demandée n'est pas en cache, l'image *fallback* est renvoyée au nav
 ## Fonctionnement de l'application
 
 L'application télécharge une liste de 16 images depuis l'API Flickr et stocke immédiatement ces informations en cache pour que le service worker puisse les *servir* en mode hors ligne.
-Ces images sont ensuite téléchargées par l'application.
+Les images sont ensuite téléchargées individuellement par l'application.
 
 En cliquant sur le bouton **Cache data**, toutes les images sont stockées en cache. Une interface minimaliste affiche la progression de la mise en cache.
 
