@@ -47,7 +47,6 @@ const App = ({ children }: Props) => {
     let cancelablePromises = useRef<Array<CancelablePromise>>([]);
     let reduxDispatch = useDispatch();
 
-    // hook called on initial mount - get pictures!
     React.useEffect(() => {
         window.addEventListener('offline', () => { setOffline(true); });
         window.addEventListener('online', () => { setOffline(false); });

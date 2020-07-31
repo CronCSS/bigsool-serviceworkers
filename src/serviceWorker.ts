@@ -10,8 +10,6 @@ interface RessourceType {
     local: boolean
 }
 
-declare var serviceWorkerOption
-
 const staticRessources:Array<RessourceType> = [
     { local: true, url: 'bundle.js' },
     { local: true, url: '/' },
@@ -52,6 +50,8 @@ self.addEventListener('fetch', (event:any) => {
 
         if( event.request.url.match(flickrRegexp) ) {
             if(event.request.destination==="image") {
+                // Pour contourner les problèmes de memory-cache du navigateur, les images sont requêtées avec un paramètre cache-deny (timestamp)
+                // Ce paramètre est retiré pour matcher les URL du cache
 
                 let cleanUrl:string = event.request.url.replace(/\?cache-deny=([0-9]+)/g,'');
                 return caches.match( cleanUrl ).then( (match:Response | undefined) => {
