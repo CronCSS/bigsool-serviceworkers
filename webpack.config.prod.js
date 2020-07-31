@@ -1,12 +1,13 @@
 const path = require('path');
+const webpack = require("webpack");
 const CopyPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin')
 
 module.exports = {
     mode: "production",
-    devtool: "source-map",
     entry: {
-        bundle: './src/index.tsx',
-        serviceworker: './src/serviceWorker.ts'
+        bundle: './src/index.tsx'
     },
     output: {
        path: path.resolve(__dirname, 'public'),
@@ -36,6 +37,10 @@ module.exports = {
                 use: ['style-loader', 'css-loader'],
             }
         ]
+    },
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM"
     },
     plugins: [
         new CopyPlugin({

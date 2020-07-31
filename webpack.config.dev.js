@@ -7,8 +7,7 @@ const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin')
 module.exports = {
     mode: "development",
     entry: {
-        bundle: './src/index.tsx',
-        // serviceworker: './src/serviceWorker.ts'
+        bundle: './src/index.tsx'
     },
     output: {
        path: path.resolve(__dirname, 'public'),

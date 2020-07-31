@@ -4,8 +4,7 @@
   "description": "Bigsool - Test technique",
   "main": "index.ts",
   "scripts": {
-    "build:dev": "webpack --config webpack.config.dev.js",
-    "build:prod": "webpack --config webpack.config.prod.js",
+    "build": "webpack --config webpack.config.prod.js",
     "start": "webpack-dev-server -d --config webpack.config.dev.js --watch"
   },
   "keywords": [],
