@@ -15,9 +15,9 @@ ReactDOM.render(
 );
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./serviceworker.js', { scope: '/' }).then(function(reg) {
-    console.log('Registration succeeded. Scope is ' + reg.scope);
-  }).catch(function(error) {
-    console.log('Registration failed with ' + error);
-  });
+    navigator.serviceWorker.register('./serviceworker.js', { scope: '/' } ).then( ( registration:ServiceWorkerRegistration ) => {
+        console.log( `Service Worker registered. Scope : ${ registration.scope }` );
+    }).catch(function(error) {
+        console.log( `Service Worker registration failed with ${ error }` );
+    });
 };

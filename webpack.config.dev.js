@@ -1,12 +1,14 @@
 const path = require('path');
+const webpack = require("webpack");
 const CopyPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin')
 
 module.exports = {
     mode: "development",
-    devtool: "source-map",
     entry: {
         bundle: './src/index.tsx',
-        serviceworker: './src/serviceWorker.ts'
+        // serviceworker: './src/serviceWorker.ts'
     },
     output: {
        path: path.resolve(__dirname, 'public'),
@@ -45,13 +47,8 @@ module.exports = {
     },
     devServer: {
         contentBase: path.resolve(__dirname, "./public"),
-        // publicPath: '/',
-        historyApiFallback: true,
-        inline: false,
         open: true,
-        hot: false,
-        overlay: false,
-        port: 3000
+        hot: true
     },
     devtool: "eval-source-map",
     externals: {
@@ -61,8 +58,17 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: 'assets', to: 'assets' }
+                { from: 'assets', to: 'assets' },
+                { from: 'src/manifest.json', to: 'public/manifest.json' }
             ]
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new HtmlWebpackPlugin({
+            template: path.join(__dirname, './src/index.dev.html')
+        }),
+        new ServiceWorkerWebpackPlugin({
+            entry: path.join(__dirname, './src/serviceWorker.ts'),
+            filename: 'serviceworker.js'
         })
     ]
 };

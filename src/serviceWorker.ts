@@ -10,14 +10,23 @@ interface RessourceType {
     local: boolean
 }
 
+declare var serviceWorkerOption
+
 const staticRessources:Array<RessourceType> = [
     { local: true, url: 'bundle.js' },
     { local: true, url: '/' },
     { local: true, url: '/index.html' },
     { local: true, url: 'assets/default_image.jpg' },
-    { local: false, url :'https://unpkg.com/react@16.13.1/umd/react.development.js' },
-    { local: false, url :'https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js' }
 ];
+
+if( process.env.NODE_ENV === "development" ){
+    staticRessources.push( { local: false, url :'https://unpkg.com/react@16/umd/react.development.js' } );
+    staticRessources.push( { local: false, url :'https://unpkg.com/react-dom@16/umd/react-dom.development.js' } );
+}
+else {
+    staticRessources.push( { local: false, url :'https://unpkg.com/react@16/umd/react.production.min.js' } );
+    staticRessources.push( { local: false, url :'https://unpkg.com/react-dom@16/umd/react-dom.production.min.js' } );
+}
 
 self.addEventListener('install', (event:any) => {
     event.waitUntil(
@@ -73,7 +82,11 @@ self.addEventListener('fetch', (event:any) => {
                     return new Response("Synthetic Reponse", {"status" : 408, "headers" : {"Content-Type" : "text/plain"} } );
                 }
             }
-            return caches.match( event.request );
+            
+            return caches.match( event.request ).then( (match:Response | undefined) => {
+                if(match===undefined) return new Response("Synthetic Reponse", {"status" : 408, "headers" : {"Content-Type" : "text/plain"} } );
+                else return match;
+            });
         }));
     }
 });

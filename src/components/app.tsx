@@ -203,7 +203,6 @@ const App = ({ children }: Props) => {
                     </div>
                 </div>
             </div>
-
             <div className="BottomNav">
                 <button type="button" className="Floating" onClick={ handleClick }><div className="Icon">cached</div><span>Cache data</span></button>
                 <button type="button" className="Floating NoText" onClick={ handleWipeClick }><div className="Icon">delete_forever</div></button>

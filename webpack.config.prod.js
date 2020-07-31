@@ -42,6 +42,17 @@ module.exports = {
             patterns: [
                 { from: 'assets', to: 'assets' }
             ]
+        }),
+        new HtmlWebpackPlugin({
+            template: path.join(__dirname, './src/index.prod.html'),
+            minify: {
+                removeComments: true,
+                collapseWhitespace: true,
+            }
+        }),
+        new ServiceWorkerWebpackPlugin({
+            entry: path.join(__dirname, './src/serviceWorker.ts'),
+            filename: 'serviceworker.js'
         })
     ]
 };
