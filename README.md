@@ -17,7 +17,6 @@ npm run build # génère un bundle de production dans /public
 ## Préambule
 
 L'application doit être mise en ligne sur un serveur sécurisé (HTTPS) ou depuis l'URL par défaut ( localhost )
-L'interface est optimsiée *mobile-first* mais s'adapte aux plus grandes résolutions. ( mediaqueries très basiques )
 
 ## Fonctionnement du service worker
 
@@ -43,3 +42,5 @@ En cliquant sur le bouton **Cache data**, toutes les images sont stockées en ca
 Un système de notifications affiche également des informations relative a la connectivité et aux opérations effectuées.
 
 Pour tester le comportement des images de remplacements / *fallback* on peut simplement re-visiter le site en mode hors ligne sans avoir mis en cache les images.
+
+L'interface est optimsiée *mobile-first* mais s'adapte aux plus grandes résolutions. ( mediaqueries très basiques )
